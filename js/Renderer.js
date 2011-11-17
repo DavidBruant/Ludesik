@@ -12,8 +12,8 @@ function Renderer(container){
     var colorPalette = ["#FFFF99","#C1272D","#F7931E","#8CC63F","#29ABE2","#662D91","#FF00FF","#0000FF"];
 
     function randomColorString(){
-       var index = Math.floor(8*Math.random());
-       var color = colorPalette[index];
+        var index = Math.floor(colorPalette.length*Math.random());
+        var color = colorPalette[index];
 
         return color;
     }

@@ -3,17 +3,19 @@
  * MIT Licence
  */
 
+"use strict";
+
 function Ludesik(renderer, container, menu){
     var map = new Map();
     var counter = 0;
     var soundPlayer;
     var intervalRef;
-    var isPlaying = false;
+    var isPlaying;
 
     var tempo;
 
-    var playBtns;
-    var pauseBtns;
+    var playPauseButton;
+    
     var slowTempoBtns;
     var speedTempoBtns;
     var saveBtns;
@@ -23,17 +25,11 @@ function Ludesik(renderer, container, menu){
     var savedStateCount = 0;
 
     /**
-     * forEach is defines here because when you get a collection via getElementByClass, it returns a NodeList
+     * forEach is defined for NodeList and HtmlCollection manipulation convinience
      * (except Firefox which returns an HtmlCollection. See bug https://bugzilla.mozilla.org/show_bug.cgi?id=14869).
      * A NodeList is not an array so forEach is not defined in the returned collection.
-     *
-     * @param items the collection of items
-     * @param f the function to call on each items
      */
-    function forEach (items, f) {
-        // We only reuse the forEach implementation of Array.prototype.
-        Array.prototype.forEach.call(items, f);
-    }
+    var forEach = Function.prototype.call.bind(Array.prototype.forEach);
 
     /**
      *
@@ -80,37 +76,11 @@ function Ludesik(renderer, container, menu){
 
     function play () {
         isPlaying = true;
-
-        forEach(playBtns,
-            function (btn) {
-                btn.disabled = true;
-            }
-        );
-
-        forEach(pauseBtns,
-            function (btn) {
-                btn.disabled = false;
-            }
-        );
-
         intervalRef = setInterval(tick, (60/tempo) * 1000);
     }
 
     function pause () {
         isPlaying = false;
-
-        forEach(playBtns,
-            function (btn) {
-                btn.disabled = false;
-            }
-        );
-
-        forEach(pauseBtns,
-            function (btn) {
-                btn.disabled = true;
-            }
-        );
-
         clearInterval(intervalRef);
     }
 
@@ -244,53 +214,51 @@ function Ludesik(renderer, container, menu){
         }
     }
 
-    /* Yes, setTempo is a public method and it calls the setTempo private method.
-    * The reason of that is security. Indeed the client could override setTempo method
-    * but some others private methods depends on setTempo method. So having a private
-    * setTempo method is a way to warranty that the behaviour of these methods will be allways the same */
-    this.setTempo = function (_tempo) {
-        setTempo(_tempo);
-    }
+    // exposing as a public method as well.
+    this.setTempo = setTempo;
 
     renderer.setOnSquareInteraction(addMobileAgent);
     renderer.setOnMobileAgentInteraction(onMobileAgentInteraction);
 
     (function(){
+        isPlaying = false;
+
         // INIT SOUNDS
         var walls = map.getWalls();
         var soundsInit = {};
 
         walls.forEach(function(wall, i){
-            //console.log("soundinit", wall, i);
-            id = wall.cardinal + wall.index;
+            var index = (wall.cardinal === "N" || wall.cardinal === "S") ?
+                            wall.index :
+                            (8 - wall.index);
+            var id = wall.cardinal + wall.index;
             
-            if(wall.cardinal === "N" || wall.cardinal === "S"){
-                soundsInit[id] = "http://dl.dropbox.com/u/20485/otomata/sounds/" + wall.index + ".ogg";
-            }
-            else{
-                soundsInit[id] = "http://dl.dropbox.com/u/20485/otomata/sounds/" + (8 - wall.index)  + ".ogg";
-            }
+            soundsInit[id] = "http://dl.dropbox.com/u/20485/otomata/sounds/" + index + ".ogg";
         });
 
         soundPlayer = new SoundPlayer(container, soundsInit);
 
-        playBtns =  menu.getElementsByClassName('play-control');
-        // TODO: Manage errors
-
-        forEach(playBtns,
-            function (btn) {
-                btn.disabled = false;
-                btn.addEventListener('click', play, false);
+        // assuming the button is unique for now
+        playPauseButton = menu.getElementsByClassName('play-pause-control')[0]; 
+        // TODO: Manage errors.
+        
+        playPauseButton.addEventListener('click', function(event){
+            var button = event.target;
+            
+            // TODO: 
+            
+            if(isPlaying){
+                pause();
+                button.textContent = 'Play';
             }
-        );
-
-        pauseBtns =  menu.getElementsByClassName('pause-control');
-        forEach(pauseBtns,
-            function (btn) {
-                btn.disabled = true;
-                btn.addEventListener('click', pause, false);
+            else{
+                play();
+                button.textContent = 'Pause';
             }
-        );
+        
+        }, false);
+
+
 
         saveBtns =  menu.getElementsByClassName('save-control');
         forEach(saveBtns,

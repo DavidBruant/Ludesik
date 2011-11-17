@@ -3,6 +3,8 @@
  * MIT Licence
  */
 
+"use strict";
+
 (function(global){
     var ludesik;
     var document = global.document;
