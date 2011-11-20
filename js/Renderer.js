@@ -22,7 +22,7 @@ function Renderer(container){
         var index = pos.y*MAX_X + pos.x;
         var square = squares[index];
         var maElement = document.createElement('div');
-        maElement.className = "mobile-agent";
+        maElement.classList.add("mobile-agent");
         refreshArrow(maElement, direction);
 
         /* To keep in sync with .mobile-agent & .map-cell css rules */
@@ -39,8 +39,7 @@ function Renderer(container){
 
         maElement.addEventListener('click', function(){
             var newInformations = onMobileAgentInteraction(maId);
-
-            maElement.className = "mobile-agent";
+            
             refreshArrow(maElement, newInformations.direction);
 
             // I didn't like what we done here so I removed it. :-)
@@ -74,19 +73,24 @@ function Renderer(container){
 //        maElement.style.mozTransform = "rotate("+angle+"deg)"; // doesn't work on Firefox
 //        maElement.style.webkitTransform = "rotate("+angle+"deg)";
 
-        
+        // remove previous style-related class
+        var classList = maElement.classList;
+        classList.remove('right-arrow');
+        classList.remove('left-arrow');
+        classList.remove('top-arrow');
+        classList.remove('bottom-arrow');
         
     
         if (direction.deltaY >= 0 && direction.deltaX > 0){
-            maElement.className += ' right-arrow';
+            classList.add('right-arrow');
         } else {
             if (direction.deltaY <= 0 && direction.deltaX < 0) {
-                maElement.className += ' left-arrow';
+                classList.add('left-arrow');
             } else {
                 if (direction.deltaY < 0 && direction.deltaX >= 0) {
-                    maElement.className += ' top-arrow';
+                    classList.add('top-arrow');
                 } else {
-                    maElement.className += ' bottom-arrow';
+                    classList.add('bottom-arrow');
                 }
             }
         }
@@ -101,15 +105,15 @@ function Renderer(container){
             function (e, i, a) {
                 var maElement = mobileAgents[e.id];
                 var pos = e.position;
-
+                var direction = e.direction;
+                
                 // Play around with 60/61 to get nice rendering depending on browser
                 // Currently works for Firefox 5
                 maElement.style.top = (pos.y*60) + 1 + 'px';
                 maElement.style.left = (pos.x*61) + 1 + 'px';
-                var direction = e.direction;
-                maElement.className = "mobile-agent";
-                refreshArrow(maElement, direction);
 
+                //maElement.className = "mobile-agent";
+                refreshArrow(maElement, direction);
             }
         );
     };
