@@ -34,7 +34,12 @@ function SoundPlayer(container, sounds) {
                 sounds.push(toPlay);
             }
             
-            toPlay.play();
+            try{ // Sometimes .play() throws an NS_ERROR_OUT_OF_MEMORY on Firefox
+                toPlay.play();
+            }
+            catch(e){
+                console.log(e);
+            }
         });
     };
 
