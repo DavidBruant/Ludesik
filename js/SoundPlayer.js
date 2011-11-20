@@ -3,32 +3,62 @@
  * MIT Licence
  */
 
-function SoundPlayer(container, sounds) {
-    var audios;
+"use strict";
 
-    //console.log(sounds);
+/**
+ * Constructor
+ * @container, DOM element where to put the audio elements
+ * @sounds, sound URLs indexed by wall identifier
+ */
+function SoundPlayer(container, sounds) {
+    var audios; // Object indexed on wall ids. It contains arrays of identical <audio> elements
 
     this.playAll = function(soundIds){
         soundIds.forEach(function(id){
-            //console.log(id, audios[id]);
-            audios[id].play();
+            var sounds = audios[id];
+            var toPlay = null;
+            
+            // If a sound is available, play it. Otherwise, clone play and store (for later)
+            
+            var someAvailable = sounds.some(function(s, i){
+                var available = s.ended || s.paused ; // TODO find the best definition
+                if(available)
+                    toPlay = s;
+                return available;
+            });
+            
+            if(!someAvailable){
+                toPlay = sounds[0].cloneNode(true);// http://robert.ocallahan.org/2011/11/latency-of-html5-sounds.html
+                // Progress at https://bugzilla.mozilla.org/show_bug.cgi?id=703379
+                toPlay.load();
+                sounds.push(toPlay);
+            }
+            
+            toPlay.play();
         });
     };
 
-
     (function() {
         var ids = Object.keys(sounds);
+        var audioByUrl = {};
+        
         audios = {};
 
         ids.forEach(function(id){
-            var a = new Audio(sounds[id]);
-            a.preload = true;
+            var url = sounds[id];
+            var a;
+            
+            if(url in audioByUrl){
+                a = audioByUrl[url];
+            }
+            else{
+                a = new Audio(url);
+                a.load();
+                audioByUrl[url] = a;
+                // No need to append it to the DOM tree
+            }
 
-            audios[id] = a;
-        });
-
-        ids.forEach(function(id){
-            container.appendChild(audios[id]);
+            audios[id] = [a];
         });
 
     }).call(this);

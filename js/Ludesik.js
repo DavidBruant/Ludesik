@@ -245,11 +245,11 @@ function Ludesik(renderer, container, menu){
         playPauseButton.addEventListener('click', function(event){
             var button = event.target;
             
-            // TODO: 
+            // TODO: ignore right clicks.
             
             if(isPlaying){
                 pause();
-                button.textContent = 'Play';
+                button.textContent = 'Play'; // TODO: figure out how to get that in sync with similar text in HTML
             }
             else{
                 play();
@@ -290,7 +290,7 @@ function Ludesik(renderer, container, menu){
 
         savedStateContainers  = menu.getElementsByClassName('saved-states');
 
-        setTempo(60);
+        setTempo(150);
 
         importStateFromCurrentUrlIfNeeded();
     }).call(this);
