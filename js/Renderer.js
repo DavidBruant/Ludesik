@@ -3,6 +3,8 @@
  * MIT Licence
  */
 
+"use strict";
+
 function Renderer(container){
     var MAX_X = 9, MAX_Y = 9;
     var squares = []; // A weakmap would be prefered to have O(1)-ish look-up
@@ -112,7 +114,6 @@ function Renderer(container){
                 maElement.style.top = (pos.y*60) + 1 + 'px';
                 maElement.style.left = (pos.x*61) + 1 + 'px';
 
-                //maElement.className = "mobile-agent";
                 refreshArrow(maElement, direction);
             }
         );
@@ -129,17 +130,15 @@ function Renderer(container){
     };
 
     this.clear = function () {
-        mobileAgents.forEach(
-            function (e, i, a) {
-                (e.parentNode).removeChild(e);
-            }
-        );
+        mobileAgents.forEach(function (e, i, a) {
+            e.parentNode.removeChild(e);
+        });
 
         mobileAgents = [];
     };
 
     (function(){
-        var i,j;
+        var i, j;
         var row, cell, table;
         var document;
 
@@ -177,7 +176,4 @@ function Renderer(container){
         }, false);
     }).call(this);
 
-
 }
-
-

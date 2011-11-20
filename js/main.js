@@ -14,24 +14,22 @@
         var menu = document.getElementById('menu');
         var tempoInputs = document.getElementsByClassName('tempo-input');
 
-        document.addEventListener("tempoChangeEvent",
+        document.addEventListener('tempoChangeEvent',
                                   function (evt) {
                                       for (var i = 0; i < tempoInputs.length; i++) {
                                             tempoInputs[i].value = evt.tempo;
                                       }
                                   },
-                                  false
-        );
+                                  false);
 
         ludesik = new Ludesik(new Renderer(container), container, menu);
 
         for (var i = 0; i < tempoInputs.length; i++) {
             tempoInputs[i].addEventListener('change',
-                                                 function (evt){
-                                                     ludesik.setTempo(parseInt(evt.currentTarget.value));
-                                                 },
-                                                 false
-            );
+                                            function (evt){
+                                                ludesik.setTempo(parseInt(evt.currentTarget.value));
+                                            },
+                                            false);
         }
     }
     

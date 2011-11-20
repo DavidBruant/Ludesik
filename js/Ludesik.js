@@ -49,7 +49,9 @@ function Ludesik(renderer, container, menu){
      */
     function addMobileAgent(position) {
         var defaultDirection = {deltaX: 1, deltaY: 0};
-        addMobileAgentWithDirection(position, defaultDirection);
+        
+        if(map.getMobileAgentsByPosition(position).length === 0) // add a mobile agent only if there is none at this position
+            addMobileAgentWithDirection(position, defaultDirection);
     }
 
     /**
@@ -69,17 +71,16 @@ function Ludesik(renderer, container, menu){
         var result = map.nextStep();
 
         soundPlayer.playAll(result.wallsInCollision);
-
         renderer.refresh(result);
     }
 
 
-    function play () {
+    function play() {
         isPlaying = true;
         intervalRef = setInterval(tick, (60/tempo) * 1000);
     }
 
-    function pause () {
+    function pause() {
         isPlaying = false;
         clearInterval(intervalRef);
     }
@@ -257,7 +258,6 @@ function Ludesik(renderer, container, menu){
             }
         
         }, false);
-
 
 
         saveBtns =  menu.getElementsByClassName('save-control');

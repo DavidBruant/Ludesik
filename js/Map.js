@@ -3,10 +3,12 @@
  * MIT Licence
  */
 
+"use strict";
+
 function Map() {
 	var walls;
 	var mobileAgents = [];
-	var mobileAgentsPositions = [];
+	var mobileAgentsPositions = []; // positions of mobile agents indexed on mobile agent ids.
 	var mobileAgentPerSquare = [];
 	
 	function getMobileAgentPerSquareIndex(id) {
@@ -32,9 +34,9 @@ function Map() {
      * Method call on interaction with mobileAgent (click for instance).
      * @param id the mobileAgentId
      */
-	this.onMobileAgentInteraction = function(id){
-		return mobileAgents[id].onInteraction();
-	};
+    this.onMobileAgentInteraction = function(id){
+        return mobileAgents[id].onInteraction();
+    };
 
     /**
      * The nextStep function compute all the new positions of mobileAgents, and detect the collisions with walls and mobileAgents.
@@ -136,8 +138,10 @@ function Map() {
          * of state.
          */
         mobileAgents.forEach(
-			function (e, i, a) {
-                state.positions.push({id:e.id, position:mobileAgentsPositions[e.id], direction:e.direction});
+			function (e, i, a){
+                state.positions.push({id:e.id, 
+                                      position:mobileAgentsPositions[e.id],
+                                      direction:e.direction});
             }
         );
 
@@ -147,21 +151,37 @@ function Map() {
     /**
      * Get all the current positions of mobile agents.
      */
-    this.getPositions = function() {
+    this.getPositions = function(){
         var state = {};
 
         state.positions = [];
 
-        mobileAgents.forEach(
-			function (e, i, a) {
-                state.positions.push({id:e.id, position:mobileAgentsPositions[e.id], direction:e.direction});
-            }
-        );
+        mobileAgents.forEach(function (e, i, a){
+            state.positions.push({id: e.id,
+                                  position: mobileAgentsPositions[e.id],
+                                  direction: e.direction});
+        });
 
         return state;
     };
+    
+    /**
+     * @param position: {x, y}
+     */
+    this.getMobileAgentsByPosition = function(position){
+        
+        return mobileAgents.filter(function(ma){
+            var id = ma.id;
+            var pos = mobileAgentsPositions[id];
 
-    this.clear = function() {
+            return position.x === pos.x &&
+                   position.y === pos.y;
+        });
+    };
+
+    this.clear = function(){
+        var i;
+        
         mobileAgents = [];
 	    mobileAgentsPositions = [];
 
@@ -169,10 +189,10 @@ function Map() {
 
 	    for(i = 0; i<9*9 ; i++){
 		    mobileAgentPerSquare[i] = [];
-		 }
+		}
     };
 
-	(function() {
+	(function(){
 		 var i;
 		 
 		 for(i = 0; i<9*9 ; i++){
@@ -181,7 +201,7 @@ function Map() {
 		 
 		 walls = {};
 		 
-		 for (var i = 0 ; i < 9 ; i++) {
+		 for(i = 0 ; i < 9 ; i++){
 			walls["W" + i] = new Wall(i, 'W');
 			walls["N" + i] = new Wall(i, 'N');
 			walls["E" + i] = new Wall(i, 'E');
