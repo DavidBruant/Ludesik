@@ -131,11 +131,14 @@ function Ludesik(renderer, container, menu){
         clear();
 
         var split = serializedState.split(";");
-        tempo = Number(split[1]);
+        tempo = parseInt(split[1]);
 
         if (serializedState[0] === '1') {
             for (var i=4; i< split.length; i+=4) {
-                addMobileAgentWithDirection({x: Number(split[i]), y: Number(split[i+1])}, {deltaX: Number(split[i+2]), deltaY: Number(split[i+3])});
+                addMobileAgentWithDirection({x: parseInt(split[i]), 
+                                             y: parseInt(split[i+1])},
+                                            {deltaX: parseInt(split[i+2]),
+                                             deltaY: parseInt(split[i+3])});
             }
         }
 
@@ -145,10 +148,22 @@ function Ludesik(renderer, container, menu){
     }
 
     function addSavedStateIntoContainers(serializedState) {
-        var savedState =  document.createElement('li');
-        savedState.textContent = 'State ' + (++savedStateCount);
-        savedState.contentEditable = true;
-        savedState.addEventListener('click', function (){loadState(serializedState)}, false);
+        var savedState = document.createElement('li');
+        
+        var spanState = document.createElement('span');
+        spanState.textContent = 'State ' + (++savedStateCount);
+        spanState.contentEditable = true;
+        // TODO: use event delegation. Add the event listener on the <ul> 
+        spanState.addEventListener('click', function (){loadState(serializedState)}, false);
+        savedState.appendChild(spanState);
+        
+
+        var removeStateButton = document.createElement('button');
+        removeStateButton.className = 'remove-state';
+        removeStateButton.textContent = '✖';
+        removeStateButton.addEventListener('click', function (){savedState.parentNode.removeChild(savedState);}, false);
+
+        savedState.appendChild(removeStateButton);
 
         forEach(savedStateContainers,
             function (container) {
@@ -162,14 +177,11 @@ function Ludesik(renderer, container, menu){
      */
     function saveState() {
         var currentPositions = map.getPositions();
-
         var serializedState = '';
-
 
         serializedState += '1;';
         serializedState += tempo;
         serializedState += ';9;9'; // map size. May be changeable eventually.
-
 
          currentPositions.positions.forEach(
 			function (e, i, a) {
